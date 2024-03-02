@@ -1,4 +1,4 @@
-package ring;
+package ring.entity;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -30,7 +30,7 @@ public class ClientServer {
             //init server
             server = new ServerSocket(port);
             System.out.println("Server started at port " + port);
-            System.out.println("Waiting for a client...");
+            System.out.println("Press Enter to start client...");
 
             @SuppressWarnings("resource")
             Scanner input = new Scanner(System.in);
@@ -54,5 +54,5 @@ public class ClientServer {
             e.printStackTrace();
         }
     }
-    
+
 }

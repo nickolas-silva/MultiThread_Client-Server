@@ -6,8 +6,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
-import ring.ClientServer;
-import ring.Message;
+import ring.entity.ClientServer;
+import ring.object.Message;
 
 public class ImpClient  implements Runnable{
     private Socket client;

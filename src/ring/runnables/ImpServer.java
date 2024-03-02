@@ -5,8 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import ring.ClientServer;
-import ring.Message;
+import ring.entity.ClientServer;
+import ring.object.Message;
 
 public class ImpServer implements Runnable{
     
