@@ -12,7 +12,7 @@ public class ImpServer implements Runnable{
     
     ImpClient nextClient;
     Socket client;
-    boolean connection = true; // colocar como true e tirar do construtor talvez
+    boolean connection = true;
 
     //input and output streams
     ObjectInputStream in;
@@ -30,8 +30,10 @@ public class ImpServer implements Runnable{
         System.out.println("Connected to client: " + client.getLocalAddress());
         try{
             while(connection){
+
                 in = new ObjectInputStream(client.getInputStream());
                 out = new ObjectOutputStream(client.getOutputStream());
+                
                 @SuppressWarnings({ "unchecked", "rawtypes" })
                 Message<String> msg = (Message) in.readObject();
                 receivedMessage = msg.getMsg();

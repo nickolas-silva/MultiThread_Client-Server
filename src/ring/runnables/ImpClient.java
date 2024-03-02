@@ -11,7 +11,7 @@ import ring.object.Message;
 
 public class ImpClient  implements Runnable{
     private Socket client;
-    private boolean connection = true; //colocar como true e tirar do construtor talvez
+    private boolean connection = true; 
 
     //object to send
     private Message<String> msg;
@@ -35,6 +35,7 @@ public class ImpClient  implements Runnable{
             String message;
 
             while (connection) {
+                
                 System.out.println("Enter message: ");
 
                 out = new ObjectOutputStream(client.getOutputStream());
@@ -58,6 +59,7 @@ public class ImpClient  implements Runnable{
             out.close();
             client.close();
             System.out.println("Client disconnected from server...");
+
         } catch (IOException e) {
             e.printStackTrace();
         }
