@@ -33,45 +33,43 @@ public class ImpServer implements Runnable{
 
                 in = new ObjectInputStream(client.getInputStream());
                 out = new ObjectOutputStream(client.getOutputStream());
-                
-                @SuppressWarnings({ "unchecked", "rawtypes" })
-                Message<String> msg = (Message) in.readObject();
-                receivedMessage = msg.getMsg();
-                System.out.println("Mensagem recebida: " + receivedMessage);
 
-                //logica para descompactar a mensagem
-                // Separa o id do cliente da mensagem
-                String[] splitMsg = receivedMessage.split("/");
-                String clientId = splitMsg[2];
-                String castType = splitMsg[1];
-                String finalMsg = splitMsg[0];
+                Message msg = (Message) in.readObject();
+                receivedMessage = msg.getMsg();
+                String clientId = msg.getSender();
+                String castType = msg.getType();
+                // System.out.println("Mensagem recebida: " + receivedMessage);
+                // System.out.println("Tipo de mensagem: " + castType);
+                // System.out.println("Enviada por: " + clientId);
+
 
                 // Caso a mensagem deva ser recebida por este id
                 if(clientId.equals(ClientServer.id) && castType.equals("unicast")) {
-                    System.out.println("Mensagem recebida de " + splitMsg[3] + ": " + finalMsg);
+                    System.out.println("Message recieved by " + clientId + ": " + receivedMessage);
                 }
                 // Caso a mensagem deva ser encaminhada para outro id
                 else if(!clientId.equals("anything") && castType.equals("unicast")){
-                    System.out.println("Encaminhando Mensagem...");
+                    System.out.println("Forwarding Message...");
                     nextClient.out.writeObject(msg);
                     nextClient.out.flush();
                 }
 
                 // Caso a mensagem seja broadcast
                 if(castType.equals("broadcast") && !ClientServer.id.equals(clientId)) {
-                    System.out.println("Mensagem Broadcast de " + splitMsg[splitMsg.length - 1] + ": " + finalMsg);
+                    System.out.println("Mensagem Broadcast de " + clientId + ": " + receivedMessage);
                     nextClient.out.writeObject(msg);
                     nextClient.out.flush();
                 }
                 
-                // Caso queira finalizar a conexão
-                if(receivedMessage.equalsIgnoreCase("fim")) {
+                // sair do loop
+                if(receivedMessage.equalsIgnoreCase("exit")) {
                     connection = false;
                 }
 
 
             }
 
+            //fechando conexões
             out.close();
             in.close();
             client.close();

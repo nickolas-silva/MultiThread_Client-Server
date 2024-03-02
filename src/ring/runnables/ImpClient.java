@@ -6,7 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
-import ring.entity.ClientServer;
+//import ring.entity.ClientServer;
 import ring.object.Message;
 
 public class ImpClient  implements Runnable{
@@ -14,7 +14,7 @@ public class ImpClient  implements Runnable{
     private boolean connection = true; 
 
     //object to send
-    private Message<String> msg;
+    private Message msg;
 
     //input and output streams
     public ObjectInputStream in;
@@ -33,21 +33,29 @@ public class ImpClient  implements Runnable{
             Scanner input = new Scanner(System.in);
 
             String message;
+            String tp;
+            String sd;
 
             while (connection) {
-                
+
                 System.out.println("Enter message: ");
 
                 out = new ObjectOutputStream(client.getOutputStream());
                 in = new ObjectInputStream(client.getInputStream());
 
                 message = input.nextLine();
-                message = message.concat("/" + ClientServer.id);
+                //message = message.concat("/" + ClientServer.id);
+
+                System.out.println("Enter message type: ");
+                tp = input.nextLine();
+
+                System.out.println("Enter sender: ");
+                sd = input.nextLine();
 
                 if (message.equalsIgnoreCase("exit")) {
                     connection = false;
                 } else{
-                    msg = new Message<String>(message);
+                    msg = new Message(message, tp, sd);
                     out.writeObject(msg);
                     out.flush();
                     System.out.println("Message SENT!");
