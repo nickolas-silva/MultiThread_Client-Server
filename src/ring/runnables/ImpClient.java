@@ -31,6 +31,7 @@ public class ImpClient  implements Runnable{
             System.out.println("Client connected to server");
             
             Scanner input = new Scanner(System.in);
+            out = new ObjectOutputStream(client.getOutputStream());
 
             String message;
             String tp;
@@ -40,8 +41,6 @@ public class ImpClient  implements Runnable{
 
                 System.out.println("Enter message: ");
 
-                out = new ObjectOutputStream(client.getOutputStream());
-                in = new ObjectInputStream(client.getInputStream());
 
                 message = input.nextLine();
 

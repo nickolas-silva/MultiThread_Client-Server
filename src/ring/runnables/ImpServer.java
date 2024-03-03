@@ -28,10 +28,8 @@ public class ImpServer implements Runnable{
         System.out.println("Connected to client: " + client.getLocalAddress());
 
         try{
+            in = new ObjectInputStream(client.getInputStream());
             while(connection){
-
-                in = new ObjectInputStream(client.getInputStream());
-                out = new ObjectOutputStream(client.getOutputStream());
 
                 Message msg = (Message) in.readObject();
                 receivedMessage = msg.getMsg();
