@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-
 import ring.entity.ClientServer;
 import ring.object.Message;
 
@@ -26,8 +25,8 @@ public class ImpServer implements Runnable{
     @Override
     public void run(){
         String receivedMessage;
-
         System.out.println("Connected to client: " + client.getLocalAddress());
+
         try{
             while(connection){
 
@@ -38,25 +37,23 @@ public class ImpServer implements Runnable{
                 receivedMessage = msg.getMsg();
                 String clientId = msg.getSender();
                 String castType = msg.getType();
-                // System.out.println("Mensagem recebida: " + receivedMessage);
-                // System.out.println("Tipo de mensagem: " + castType);
-                // System.out.println("Enviada por: " + clientId);
 
-
-                // Caso a mensagem deva ser recebida por este id
-                if(clientId.equals(ClientServer.id) && castType.equals("unicast")) {
-                    System.out.println("Message recieved by " + clientId + ": " + receivedMessage);
-                }
-                // Caso a mensagem deva ser encaminhada para outro id
-                else if(!clientId.equals("anything") && castType.equals("unicast")){
-                    System.out.println("Forwarding Message...");
+                // Unicast
+                if(castType.equals("unicast") && clientId.equals(ClientServer.id)) {
+                    System.out.println("================================================================");
+                    System.out.println("Message recieved by " + ClientServer.id + ": " + receivedMessage);
+                    System.out.println("================================================================");
+                } else if (castType.equals("unicast") && !clientId.equals(ClientServer.id)) {
+                    System.out.println("Forwarding Message for " + clientId + "...");
                     nextClient.out.writeObject(msg);
                     nextClient.out.flush();
                 }
-
-                // Caso a mensagem seja broadcast
+                
+                // Broadcast
                 if(castType.equals("broadcast") && !ClientServer.id.equals(clientId)) {
+                    System.out.println("================================================================");
                     System.out.println("Mensagem Broadcast de " + clientId + ": " + receivedMessage);
+                    System.out.println("================================================================");
                     nextClient.out.writeObject(msg);
                     nextClient.out.flush();
                 }
@@ -65,7 +62,6 @@ public class ImpServer implements Runnable{
                 if(receivedMessage.equalsIgnoreCase("exit")) {
                     connection = false;
                 }
-
 
             }
 

@@ -44,7 +44,6 @@ public class ImpClient  implements Runnable{
                 in = new ObjectInputStream(client.getInputStream());
 
                 message = input.nextLine();
-                //message = message.concat("/" + ClientServer.id);
 
                 System.out.println("Enter message type: ");
                 tp = input.nextLine();
@@ -76,7 +75,4 @@ public class ImpClient  implements Runnable{
     public Socket getClient() {
         return this.client;
     }
-
-
-    
 }

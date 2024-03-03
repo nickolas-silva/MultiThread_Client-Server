@@ -3,13 +3,13 @@ package ring.object;
 import java.io.Serializable;
 
 public class Message implements Serializable{
+    
     private static final long serialVersionUID = 1L;
     private String msg;
     private String type;
     private String sender;
 
     public Message(){}
-    
 
     public Message(String msg, String type, String sender){
         this.msg = msg;
