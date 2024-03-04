@@ -30,7 +30,8 @@ public class ImpClient implements Runnable {
             String tp;
             String sd;
             String finalMsg;
-            boolean noProblems = true;
+
+            boolean verifyErro = true;
 
             while (connection) {
 
@@ -51,10 +52,10 @@ public class ImpClient implements Runnable {
                     connection = false;
                 } else {
 
-                    while (!tp.equals("unicast") && noProblems) {
+                    while (!tp.equals("unicast") && verifyErro) {
 
                         if (tp.equals("broadcast")) {
-                            noProblems = false;
+                            verifyErro = false;
                         } else {
                             System.out.println("Incorrect input, please try again: ");
 
@@ -75,7 +76,7 @@ public class ImpClient implements Runnable {
 
                     System.out.println("Message SENT!");
                     ps.println(finalMsg);
-                    noProblems = true;
+                    verifyErro = true;
 
                 }
 
