@@ -40,8 +40,6 @@ public class ImpClient  implements Runnable{
             while (connection) {
 
                 System.out.println("Enter message: ");
-
-
                 message = input.nextLine();
 
                 System.out.println("Enter message type: ");

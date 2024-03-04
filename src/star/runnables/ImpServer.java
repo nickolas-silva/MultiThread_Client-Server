@@ -1,76 +1,105 @@
 package star.runnables;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.net.Socket;
-import ring.entity.ClientServer;
-import ring.object.Message;
 
-public class ImpServer implements Runnable{
-    
-    ImpClient nextClient;
-    Socket client;
-    boolean connection = true;
+import star.entity.ClientServer;
 
-    //input and output streams
-    ObjectInputStream in;
-    ObjectOutputStream out;
-    
-    public ImpServer(Socket client, ImpClient nextClient) {
-        this.client = client;
-        this.nextClient = nextClient;
+public class ImpServer implements Runnable {
+
+    public static List<Socket> clients = new ArrayList<>();
+    private Socket client;
+    private boolean connection = true;
+    private Scanner input = null;
+
+    public ImpServer(Socket c) {
+        this.client = c;
+        clients.add(c);
     }
 
     @Override
-    public void run(){
+    public void run() {
+
         String receivedMessage;
-        System.out.println("Connected to client: " + client.getLocalAddress());
 
-        try{
-            while(connection){
+        try {
 
-                in = new ObjectInputStream(client.getInputStream());
-                out = new ObjectOutputStream(client.getOutputStream());
+            input = new Scanner(client.getInputStream());
 
-                Message msg = (Message) in.readObject();
-                receivedMessage = msg.getMsg();
-                String clientId = msg.getSender();
-                String castType = msg.getType();
+            //Message
+            String separetedMsg[];
+            String castType;
+            String msg;
+            int clientId;
+            String sender;
 
-                // Unicast
-                if(castType.equals("unicast") && clientId.equals(ClientServer.id)) {
+            Socket destiny = null;
+            PrintStream printer = null;
+
+            while (connection) {
+
+                //descompressing message
+                receivedMessage = input.nextLine();
+                separetedMsg = receivedMessage.split("-");
+                msg = separetedMsg[0];
+                castType = separetedMsg[1];
+                clientId = Integer.parseInt(separetedMsg[2]);
+                sender = separetedMsg[3];
+
+                //unicast
+                if (clientId == ClientServer.id && castType.equals("unicast")) {
                     System.out.println("================================================================");
-                    System.out.println("Message recieved by " + ClientServer.id + ": " + receivedMessage);
+                    System.out.println("Message unicast recived from S" + sender + ": " + msg);
                     System.out.println("================================================================");
-                } else if (castType.equals("unicast") && !clientId.equals(ClientServer.id)) {
-                    System.out.println("Forwarding Message for " + clientId + "...");
-                    nextClient.out.writeObject(msg);
-                    nextClient.out.flush();
+                } else if (clientId != 999 && castType.equals("unicast")) {
+                    System.out.println("---------------------->");
+                    System.out.println("Forwarding Message from S" + sender + " to S" + clientId + "...");
+
+                    destiny = new Socket("localhost", 3030 + clientId);
+                    printer = new PrintStream(destiny.getOutputStream());
+                    printer.println(receivedMessage);
+
                 }
-                
-                // Broadcast
-                if(castType.equals("broadcast") && !ClientServer.id.equals(clientId)) {
-                    System.out.println("================================================================");
-                    System.out.println("Mensagem Broadcast de " + clientId + ": " + receivedMessage);
-                    System.out.println("================================================================");
-                    nextClient.out.writeObject(msg);
-                    nextClient.out.flush();
-                }
-                
-                // sair do loop
-                if(receivedMessage.equalsIgnoreCase("exit")) {
-                    connection = false;
-                }
 
+                //broadcast
+                if (castType.equals("broadcast")) {
+
+                    if (ClientServer.id != 1) {
+                        System.out.println("================================================================");
+                        System.out.println("Message Broadcast from S" + separetedMsg[separetedMsg.length - 1] + ": " + msg);
+                        System.out.println("================================================================");
+                    } else {
+
+                        for (int i = 1; i <= clients.size(); i++) {
+
+                            if (ClientServer.id == 1 && i == 1 && clientId != 1) {
+                                System.out.println("================================================================");
+                                System.out.println(
+                                        "Message Broadcast from S" + separetedMsg[separetedMsg.length - 1] + ": " + msg);
+                                System.out.println("================================================================");
+                            } else if (i != clientId) {
+                                destiny = new Socket("localhost", 3030 + i);
+                                printer = new PrintStream(destiny.getOutputStream());
+                                printer.println(receivedMessage);
+                            }
+                        }
+                    }
+                }
+                //sair
+                if (receivedMessage.equalsIgnoreCase("exit"))  connection = false;
             }
-
-            //fechando conexões
-            out.close();
-            in.close();
+            input.close();
+            destiny.close();
+            printer.close();
             client.close();
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
+
 }

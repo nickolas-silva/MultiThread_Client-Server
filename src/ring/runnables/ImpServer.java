@@ -50,7 +50,7 @@ public class ImpServer implements Runnable{
                 // Broadcast
                 if(castType.equals("broadcast") && !ClientServer.id.equals(clientId)) {
                     System.out.println("================================================================");
-                    System.out.println("Mensagem Broadcast de " + clientId + ": " + receivedMessage);
+                    System.out.println("Message Broadcast from " + clientId + ": " + receivedMessage);
                     System.out.println("================================================================");
                     nextClient.out.writeObject(msg);
                     nextClient.out.flush();

@@ -1,49 +1,42 @@
 package star.runnables;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
 
-//import ring.entity.ClientServer;
-import ring.object.Message;
+import star.entity.ClientServer;
 
-public class ImpClient  implements Runnable{
-    private Socket client;
-    private boolean connection = true; 
+public class ImpClient implements Runnable {
 
-    //object to send
-    private Message msg;
+    public static Socket client;
+    private boolean connection = true;
+    public static PrintStream ps;
 
-    //input and output streams
-    public ObjectInputStream in;
-    public ObjectOutputStream out;
-
-    public ImpClient(Socket client) {
-        this.client = client;
+    public ImpClient(Socket c) {
+        ImpClient.client = c;
     }
 
     @Override
     public void run() {
         try {
-            
-            System.out.println("Client connected to server");
-            
+            System.out.println("Client S" + ClientServer.id + " connected to server");
+
             Scanner input = new Scanner(System.in);
 
-            String message;
+            ps = new PrintStream(client.getOutputStream());
+
+            String msg;
             String tp;
             String sd;
+            String finalMsg;
+            boolean noProblems = true;
 
             while (connection) {
 
+                //input do usuário
                 System.out.println("Enter message: ");
-
-                out = new ObjectOutputStream(client.getOutputStream());
-                in = new ObjectInputStream(client.getInputStream());
-
-                message = input.nextLine();
+                msg = input.nextLine();
 
                 System.out.println("Enter message type: ");
                 tp = input.nextLine();
@@ -51,28 +44,51 @@ public class ImpClient  implements Runnable{
                 System.out.println("Enter sender: ");
                 sd = input.nextLine();
 
-                if (message.equalsIgnoreCase("exit")) {
+                finalMsg = msg + "-" + tp + "-" + sd + "-" + ClientServer.id;
+
+                //sair
+                if (finalMsg.equalsIgnoreCase("exit")) {
                     connection = false;
-                } else{
-                    msg = new Message(message, tp, sd);
-                    out.writeObject(msg);
-                    out.flush();
+                } else {
+
+                    while (!tp.equals("unicast") && noProblems) {
+
+                        if (tp.equals("broadcast")) {
+                            noProblems = false;
+                        } else {
+                            System.out.println("Incorrect input, please try again: ");
+
+                            System.out.println("Enter message: ");
+                            msg = input.nextLine();
+
+                            System.out.println("Enter message type: ");
+                            tp = input.nextLine();
+
+                            System.out.println("Enter sender: ");
+                            sd = input.nextLine();
+
+                            finalMsg = msg + "-" + tp + "-" + sd + "-" + ClientServer.id;
+
+                        }
+
+                    }
+
                     System.out.println("Message SENT!");
+                    ps.println(finalMsg);
+                    noProblems = true;
+
                 }
+
             }
 
             input.close();
-            in.close();
-            out.close();
+            ps.close();
             client.close();
-            System.out.println("Client disconnected from server...");
 
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
 
-    public Socket getClient() {
-        return this.client;
-    }
 }
