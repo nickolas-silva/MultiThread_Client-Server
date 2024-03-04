@@ -3,6 +3,7 @@ package star.entity;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Scanner;
 
 import star.runnables.ImpClient;
 import star.runnables.ImpServer;
@@ -30,6 +31,12 @@ public class ClientServer {
             //init server
             server = new ServerSocket(port);
             System.out.println("Server started at port " + port);
+
+            System.out.println("Press Enter to start client...");
+
+            @SuppressWarnings("resource")
+            Scanner input = new Scanner(System.in);
+            input.nextLine();
 
             //init client
             client = new Socket(ip,nextPort);
